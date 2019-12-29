@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<th:block th:include="member/partials/header :: header"></th:block>
+<body>
+
+    <input type="hidden" id="ses_iduser" th:value="${session.id_user}">
+
+    <div class="preloader">
+        <div class="loader">
+            <div class="loader__figure"></div>
+            <p class="loader__label">Member</p>
+        </div>
+    </div>
+
+    <div id="main-wrapper">
+        <th:block th:include="member/partials/navbar :: navbar"></th:block>
+
+        <div class="page-wrapper">
+            <div class="container-fluid">
+
+                <div class="row page-titles">
+                    <div class="col-md-5 align-self-center">
+                        <h3 class="text-themecolor">Kas Masuk</h3>
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="javascript:void(0)">Member</a></li>
+                            <li class="breadcrumb-item active">Kas Masuk</li>
+                        </ol>
+                    </div>
+                    <div class="col-md-7 align-self-center">
+                        <a href="/member/kas_keluar" class="btn waves-effect waves-light btn btn-primary pull-right hidden-sm-down ml-1"><i class="fa fa-minus"></i> Ambil Kas</a>
+                        <a href="#" class="btn waves-effect waves-light btn btn-primary pull-right hidden-sm-down mr-1" data-toggle="modal" data-target="#modalAdd"><i class="fa fa-plus"></i> Tambah Kas</a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title">Kas Masuk</h4>
+                                <div class="table-responsive">
+                                    <table class="table" id="table">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Kode</th>
+                                                <th>Keterangan</th>
+                                                <th>Jumlah</th>
+                                                <th>Tanggal</th>
+                                                <th width="15%">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <th:block th:include="member/partials/footer :: footer"></th:block>
+        </div>
+    </div>
+
+    <th:block th:include="member/partials/js :: js"></th:block>
+    <th:block th:include="member/modal/modal_in :: modal_in"></th:block>
+
+    <script>
+        $(document).ready( function () {
+            reloadTable();
+            // setInterval(function(){reloadTable()}, 5000);
+
+            //DELETE DATA ACTION
+            $(document).on("click","#ModalDeleteAction",function() {
+                var ModalKodeInDelete = $("#ModalKodeInDelete").val();
+
+                $.ajax({
+                    type : "DELETE",
+                    url : "/member/api/kas_masuk/" + ModalKodeInDelete,
+                    success: function(resultMsg){
+                        toastMsg("success", "Data Berhasil dihapus!");
+                        $('#modalDelete').modal('hide');
+                        reloadTable();
+                    },
+                    error : function(e) {
+                        console.log("ERROR: ", e);
+                    }
+                });
+            });
+
+            //ADD DATA PEMASUKAN ACTION
+            $(document).on("submit", "#formInAdd", function(e){
+                e.preventDefault();
+                var keterangan = $("#keterangan").val();
+                var jumlah = $("#jumlah").val();
+                var tanggal = currentDate();
+                var sessionIdUser = $('#ses_iduser').val();
+
+                $.ajax({
+                    type : "GET",
+                    url : "/member/api/kas_masuk/",
+                    success: function(response){
+                        var length = response.length;
+                        var lastKode = response[length-1].kodeIn;
+                        var subtring = lastKode.substring(2);
+                        $.ajax({
+                            type: "POST",
+                            url: "/member/api/kas_masuk/",
+                            contentType: "application/json",
+                            dataType: 'json',
+                            data: '{"kodeIn" : "KM'+makeUniqueKode(subtring)+'", ' +
+                                  '"idUser" : "'+sessionIdUser+'", ' +
+                                  '"keteranganIn" : "'+keterangan+'", ' +
+                                  '"jumlahIn" : "'+jumlah+'",' +
+                                  '"tanggalIn" : "'+tanggal+'" }',
+                            success: function(){
+                                toastMsg("success", "Data berhasil ditambahkan!");
+                                $("#formInAdd")[0].reset();
+                                $("#modalAdd").modal('hide');
+                                reloadTable();
+                            },
+                            error : function(e) {
+                                console.log("ERROR: ", e);
+                            }
+                        });
+                    },
+                    error : function(e) {
+                        console.log("ERROR: ", e);
+                    }
+                });
+            });
+
+            //UPDATE DATA ACTION
+            $(document).on("submit", "#formInUpdate", function(e){
+                e.preventDefault();
+                var kode = $("#ModalKodeInUpdate").val();
+                var keterangan = $("#keteranganUpdate").val();
+                var jumlah = $("#jumlahUpdate").val();
+
+                $.ajax({
+                    type: "PUT",
+                    url: "/member/api/kas_masuk/"+kode,
+                    contentType: "application/json",
+                    dataType: 'json',
+                    data: '{"keteranganIn" : "'+keterangan+'", ' +
+                          '"jumlahIn" : "'+jumlah+'"}',
+                    success: function(){
+                        toastMsg("success", "Data berhasil diubah!");
+                        $("#formInUpdate")[0].reset();
+                        $("#modalUpdate").modal('hide');
+                        reloadTable();
+                    },
+                    error : function(e) {
+                        console.log("ERROR: ", e);
+                    }
+                });
+            });
+
+        });
+
+        function clickDelete(kode){
+            $("#ModalKodeInDelete").val(kode);
+            $("#modalDeleteStrong").text(kode);
+        }
+
+        function clickUpdate(kode, keterangan, jumlah){
+            $("#ModalKodeInUpdate").val(kode);
+            $("#keteranganUpdate").val(keterangan);
+            $("#jumlahUpdate").val(jumlah);
+        }
+
+        function toastMsg(type, msg){
+            nativeToast({ //https://www.cssscript.com/create-android-style-toasts-notification-bars-pure-javascript-native-toast/
+                message: ''+msg+'',
+                type: ''+type+'', //success | info | error | warning
+                debug: false,
+                timeout: 5000
+            })
+        }
+
+        function currentDate(){
+            var d = new Date();
+            var month = d.getMonth()+1;
+            var day = d.getDate();
+            var output = d.getFullYear() + '-' +
+                ((''+month).length<2 ? '0' : '') + month + '-' +
+                ((''+day).length<2 ? '0' : '') + day;
+            return output;
+        }
+
+        function makeUniqueKode(n, z) {
+            var width = 6; n++;
+            z = z || '0';
+            n = n + '';
+            return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+        }
+
+        function reloadTable(){
+            $('#table tbody').empty();
+            var sessionIdUser = $('#ses_iduser').val();
+            $.ajax({
+                type : "GET",
+                url : "/member/api/kas_masuk/iu/"+sessionIdUser,
+                success: function(result){
+                    $.each(result, function(index, data){ index++;
+                        var row = '<tr>' +
+                            '<td>' + index + '</td>' +
+                            '<td>' + data.kodeIn + '</td>' +
+                            '<td>' + data.keteranganIn + '</td>' +
+                            '<td>' + data.jumlahIn + '</td>' +
+                            '<td>' + data.tanggalIn + '</td>' +
+                            '<td>' +
+                            '<button class="btn btn-success mr-1 btn-circle" onclick="clickUpdate(\''+data.kodeIn+'\', \''+data.keteranganIn+'\', \''+data.jumlahIn+'\')" data-toggle="modal" data-target="#modalUpdate" ><i class="fa fa-edit"></i></button>' +
+                            '<button class="btn btn-danger ml-1 btn-circle" onclick="clickDelete(\''+data.kodeIn+'\')" data-toggle="modal" data-target="#modalDelete">' +
+                            '<i class="fa fa-trash"></i>' +
+                            '</button>' +
+                            '</td>' +
+                            '</tr>';
+                            // console.log(result.length === null);
+
+                        if(result.length === null){
+                            row = '<td colspan="6" class="text-center">Waduh, belum ada data kas masuk</td>';
+                        }
+                        $('#table tbody').append(row);
+                    });
+                },
+                error : function(e) {
+                    console.log("ERROR: ", e);
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<th:block th:include="member/partials/header :: header"></th:block>
+<body>
+
+    <input type="hidden" id="ses_iduser" th:value="${session.id_user}">
+
+    <div class="preloader">
+        <div class="loader">
+            <div class="loader__figure"></div>
+            <p class="loader__label">Member</p>
+        </div>
+    </div>
+
+    <div id="main-wrapper">
+        <th:block th:include="member/partials/navbar :: navbar"></th:block>
+
+        <div class="page-wrapper">
+            <div class="container-fluid">
+                <th:block th:include="member/pages/dashboard :: dashboard"></th:block>
+
+            </div>
+
+            <th:block th:include="member/partials/footer :: footer"></th:block>
+        </div>
+    </div>
+
+    <th:block th:include="member/partials/js :: js"></th:block>
+
+    <script>
+        $(document).ready(function () {
+            sumKasMasuk();
+            sumKasKeluar();
+            sumSisa();
+
+            setInterval(function(){
+                sumKasMasuk();
+                sumKasKeluar();
+                sumSisa();
+
+            }, 1000);
+        });
+
+        function sumKasMasuk(){
+            var sessionIdUser = $('#ses_iduser').val();
+            $.ajax({
+                type : "GET",
+                url : "/member/api/kas_masuk/iu/"+sessionIdUser,
+                success: function(result){
+                    var sumJumlahIn = 0;
+                    $.each(result, function(index, data){ index++;
+                        sumJumlahIn += data.jumlahIn;
+                    });
+                    $("#sumkasmasuk").text(sumJumlahIn);
+                },
+                error : function(e) {
+                    console.log("ERROR: ", e);
+                }
+            });
+        }
+        function sumKasKeluar(){
+            var sessionIdUser = $('#ses_iduser').val();
+            $.ajax({
+                type : "GET",
+                url : "/member/api/kas_keluar/iu/"+sessionIdUser,
+                success: function(result){
+                    var sumJumlahOut = 0;
+                    $.each(result, function(index, data){ index++;
+                        sumJumlahOut += data.jumlahOut;
+                    });
+                    $("#sumkaskeluar").text(sumJumlahOut);
+                },
+                error : function(e) {
+                    console.log("ERROR: ", e);
+                }
+            });
+        }
+
+        function sumSisa(){
+            var sumkasmasuk = $("#sumkasmasuk").text();
+            var sumkaskeluar = $("#sumkaskeluar").text();
+            $("#sumsisa").text(sumkasmasuk - sumkaskeluar);
+        }
+
+
+    </script>
+</body>
+</html>

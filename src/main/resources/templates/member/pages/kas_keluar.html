@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<th:block th:include="member/partials/header :: header"></th:block>
+<body>
+
+    <input type="hidden" id="ses_iduser" th:value="${session.id_user}">
+
+    <div class="preloader">
+        <div class="loader">
+            <div class="loader__figure"></div>
+            <p class="loader__label">Member</p>
+        </div>
+    </div>
+
+    <div id="main-wrapper">
+        <th:block th:include="member/partials/navbar :: navbar"></th:block>
+
+        <div class="page-wrapper">
+            <div class="container-fluid">
+
+                <div class="row page-titles">
+                    <div class="col-md-5 align-self-center">
+                        <h3 class="text-themecolor">Kas Keluar</h3>
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="javascript:void(0)">Member</a></li>
+                            <li class="breadcrumb-item active">Kas Keluar</li>
+                        </ol>
+                    </div>
+                    <div class="col-md-7 align-self-center">
+                        <a href="#" class="btn waves-effect waves-light btn btn-primary pull-right hidden-sm-down ml-1" data-toggle="modal" data-target="#modalOutAdd"><i class="fa fa-minus"></i> Tambah Pengeluaran</a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title">Kas Keluar</h4>
+                                <div class="table-responsive">
+                                    <table class="table" id="datatables">
+                                        <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Kode</th>
+                                            <th>Keterangan</th>
+                                            <th>Jumlah</th>
+                                            <th>Tanggal</th>
+                                            <th width="15%">Action</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <th:block th:include="member/partials/footer :: footer"></th:block>
+        </div>
+    </div>
+
+    <th:block th:include="member/partials/js :: js"></th:block>
+    <th:block th:include="member/modal/modal_out :: modal_out"></th:block>
+
+    <script>
+        $(document).ready( function () {
+
+            reloadTable();
+
+            //ADD DATA PENGELUARAN (AMBIL KAS) ACTION
+            $(document).on("submit", "#formOutAdd", function(e){
+                e.preventDefault();
+                var keterangan = $("#keteranganOutAdd").val();
+                var jumlah = $("#jumlahOutAdd").val();
+                var tanggal = currentDate();
+                var sessionIdUser = $("#ses_iduser").val();
+
+                $.ajax({
+                    type : "GET",
+                    url : "/member/api/kas_keluar/",
+                    success: function(response){
+                        var length = response.length;
+                        var lastKode = response[length-1].kodeOut;
+                        var subtring = lastKode.substring(2);
+                        $.ajax({
+                            type: "POST",
+                            url: "/member/api/kas_keluar/",
+                            contentType: "application/json",
+                            dataType: 'json',
+                            data: '{"kodeOut" : "KK'+makeUniqueKode(subtring)+'", ' +
+                                    '"idUser" : "'+sessionIdUser+'", ' +
+                                    '"keteranganOut" : "'+keterangan+'", ' +
+                                    '"jumlahOut" : "'+jumlah+'",' +
+                                    '"tanggalOut" : "'+tanggal+'" }',
+                            success: function(){
+                                toastMsg("success", "Data Pengeluaran berhasil ditambahkan!");
+                                $("#formOutAdd")[0].reset();
+                                $("#modalOutAdd").modal('hide');
+                                reloadTable();
+                            },
+                            error : function(e) {
+                                console.log("ERROR: ", e);
+                            }
+                        });
+                    },
+                    error : function(e) {
+                        console.log("ERROR: ", e);
+                    }
+                });
+            });
+
+            //DELETE DATA
+            $(document).on("click","#modalOutDeleteAction",function() {
+                var kode = $("#ModalOutDeleteKode").val();
+
+                $.ajax({
+                    type : "DELETE",
+                    url : "/member/api/kas_keluar/" + kode,
+                    success: function(resultMsg){
+                        toastMsg("success", "Data Berhasil dihapus!");
+                        $('#modalOutDelete').modal('hide');
+                        reloadTable();
+                    },
+                    error : function(e) {
+                        console.log("ERROR: ", e);
+                    }
+                });
+            });
+
+            //UPDATE DATA
+            $(document).on("submit", "#formOutUpdate", function(e){
+                e.preventDefault();
+                var kode = $("#ModalOutUpdateKode").val();
+                var keterangan = $("#keteranganOutUpdate").val();
+                var jumlah = $("#jumlahOutUpdate").val();
+
+                $.ajax({
+                    type: "PUT",
+                    url: "/member/api/kas_keluar/"+kode,
+                    contentType: "application/json",
+                    dataType: 'json',
+                    data: '{"keteranganOut" : "'+keterangan+'", ' +
+                        '"jumlahOut" : "'+jumlah+'"}',
+                    success: function(){
+                        toastMsg("success", "Data pengeluaran berhasil diubah!");
+                        $("#formOutUpdate")[0].reset();
+                        $("#modalOutUpdate").modal('hide');
+                        reloadTable();
+                    },
+                    error : function(e) {
+                        console.log("ERROR: ", e);
+                    }
+                });
+            });
+
+
+        });
+
+        function clickDelete(kode){
+            $("#ModalOutDeleteKode").val(kode);
+            $("#modalOutDeleteStrong").text(kode);
+        }
+
+        function clickUpdate(kode, keterangan, jumlah){
+            $("#ModalOutUpdateKode").val(kode);
+            $("#keteranganOutUpdate").val(keterangan);
+            $("#jumlahOutUpdate").val(jumlah);
+        }
+
+        function toastMsg(type, msg){
+            nativeToast({ //https://www.cssscript.com/create-android-style-toasts-notification-bars-pure-javascript-native-toast/
+                message: ''+msg+'',
+                type: ''+type+'', //success | info | error | warning
+                debug: false,
+                timeout: 5000
+            })
+        }
+
+        function currentDate(){
+            var d = new Date();
+            var month = d.getMonth()+1;
+            var day = d.getDate();
+            var output = d.getFullYear() + '-' +
+                ((''+month).length<2 ? '0' : '') + month + '-' +
+                ((''+day).length<2 ? '0' : '') + day;
+            return output;
+        }
+
+        function makeUniqueKode(n, z) {
+            var width = 6; n++;
+            z = z || '0';
+            n = n + '';
+            return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+        }
+
+        function reloadTable(){
+            $('#datatables tbody').empty();
+            var sessionIdUser = $('#ses_iduser').val();
+            $.ajax({
+                type : "GET",
+                url : "/member/api/kas_keluar/iu/"+sessionIdUser,
+                success: function(result){
+                    $.each(result, function(index, data){ index++;
+                        var customerRow = '<tr>' +
+                            '<td>' + index + '</td>' +
+                            '<td>' + data.kodeOut + '</td>' +
+                            '<td>' + data.keteranganOut + '</td>' +
+                            '<td>' + data.jumlahOut + '</td>' +
+                            '<td>' + data.tanggalOut + '</td>' +
+                            '<td>' +
+                            '<button class="btn btn-success mr-1 btn-circle" onclick="clickUpdate(\''+data.kodeOut+'\', \''+data.keteranganOut+'\', \''+data.jumlahOut+'\')" data-toggle="modal" data-target="#modalOutUpdate"><i class="fa fa-edit"></i></button>' +
+                            '<button class="btn btn-danger ml-1 btn-circle" onclick="clickDelete(\''+data.kodeOut+'\')" data-toggle="modal" data-target="#modalOutDelete"><i class="fa fa-trash"></i></button>' +
+                            '</td>' +
+                            '</tr>';
+                        if(result.length < 1){
+                            customerRow = '<td colspan="6" class="text-center">Waduh, belum ada data kas keluar</td>';
+                        }
+                        $('#datatables tbody').append(customerRow);
+                    });
+                },
+                error : function(e) {
+                    console.log("ERROR: ", e);
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>

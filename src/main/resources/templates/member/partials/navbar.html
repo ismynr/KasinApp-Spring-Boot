@@ -1,0 +1,62 @@
+<th:block th:fragment="navbar">
+    <header class="topbar">
+        <nav class="navbar top-navbar navbar-expand-md navbar-light">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="/member">
+                    <img src="/member_asset/img/img_topbar.png" width="80" alt="homepage" class="dark-logo" />
+                    <span class="font-weight-bold"> MEMBER </span>
+                    <!--<img src="assets/img/logo-text.png" alt="homepage" class="dark-logo" />-->
+                </a>
+            </div>
+
+            <div class="navbar-collapse">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <a class="nav-link nav-toggler hidden-md-up waves-effect waves-dark" href="javascript:void(0)">
+                            <i class="fa fa-bars"></i>
+                        </a>
+                    </li>
+                </ul>
+                <!-- ============================================================== -->
+                <!-- User profile and search -->
+                <!-- ============================================================== -->
+                <ul class="navbar-nav my-lg-0">
+                    <!-- ============================================================== -->
+                    <!-- Profile -->
+                    <!-- ============================================================== -->
+                    <li class="nav-item dropdown u-pro">
+                        <a class="nav-link dropdown-toggle waves-effect waves-dark profile-pic" href="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <img src="/member_asset/img/pngguru2.png" alt="user" class="" /> <span class="hidden-md-down ml-1" th:text="${session.nama}"></span>
+                        </a>
+                        <a class="nav-link waves-effect waves-dark profile-pic" th:href="@{/}">
+                            <i class="fas fa-home"></i> <span class="hidden-md-down ml-1">Home</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <aside class="left-sidebar">
+                <!-- Sidebar scroll-->
+                <div class="scroll-sidebar">
+                    <!-- Sidebar navigation-->
+                    <nav class="sidebar-nav">
+                        <ul id="sidebarnav">
+                            <li> <a class="waves-effect waves-dark" href="/member/dashboard" aria-expanded="false"><i class="fas fa-tachometer-alt"></i><span class="hide-menu">Dashboard</span></a>
+                            </li>
+                            <li> <a class="waves-effect waves-dark" href="/member/kas_masuk" aria-expanded="false"><i class="fas fa-wallet"></i><span class="hide-menu">Kas Masuk</span></a>
+                            </li>
+                            <li> <a class="waves-effect waves-dark" href="/member/kas_keluar" aria-expanded="false"><i class="fas fa-hand-holding-usd"></i><span class="hide-menu">Kas Keluar</span></a>
+                            </li>
+                            <li> <a class="waves-effect waves-dark" href="/member/profile" aria-expanded="false"><i class="fas fa-user-circle"></i><span class="hide-menu">Profile</span></a>
+                            </li>
+                            <li> <a class="waves-effect waves-dark" href="/logout" aria-expanded="false"><i class="fas fa-user-circle"></i><span class="hide-menu">Logout</span></a>
+                            </li>
+                        </ul>
+            </nav>
+            <!-- End Sidebar navigation -->
+        </div>
+        <!-- End Sidebar scroll-->
+    </aside>
+</th:block>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<th:block th:include="partials/header :: header"></th:block>
+<body>
+    <link rel="stylesheet" th:href="@{/css/login_reg.css}" type="text/css"/>
+    <th:block th:include="partials/navbar :: navbar"></th:block>
+
+    <div class="wrapper fadeInDown mt-5">
+        <div id="formContent">
+            <h4 style="color:red">
+                <div th:class="${flashMod}" role="alert">
+                    <th:block th:text="${flashMsg}"></th:block>
+                </div>
+            </h4>
+
+            <h2 class="active"> Daftar Akun </h2>
+            <form th:action="@{/register/auth}" th:object="${usersobject}" method="POST" name="RegisterForm">
+                <input type="text" th:field="*{nama}" id="nama" class="fadeIn second" name="nama" placeholder="Masukan nama organisasi" required/>
+                <input type="email" th:field="*{email}" id="email" class="fadeIn second" name="email" placeholder="Email" required>
+                <input type="password" th:field="*{password}" id="password" class="fadeIn third" name="password" placeholder="Password" required>
+                <input type="password" id="re_password" class="fadeIn third" name="re_password" placeholder="Tulis ulang password" required>
+                <input type="submit" class="fadeIn fourth primary-btn" name="submit_register" value="Sign In">
+            </form>
+
+            <div id="formFooter">
+                Sudah Punya Akun ? <a class="underlineHover" href="login">Ayo Login !</a>
+            </div>
+        </div>
+    </div>
+
+    <th:block th:include="partials/footer :: footer"></th:block>
+    <th:block th:include="partials/js :: js"></th:block>
+</body>
+</html>

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<th:block th:include="member/partials/header :: header"></th:block>
+<body>
+
+<div class="preloader">
+    <div class="loader">
+        <div class="loader__figure"></div>
+        <p class="loader__label">Member</p>
+    </div>
+</div>
+
+<div id="main-wrapper">
+    <th:block th:include="member/partials/navbar :: navbar"></th:block>
+
+    <div class="page-wrapper">
+        <div class="container-fluid">
+
+            <div class="row page-titles">
+                <div class="col-md-5 align-self-center">
+                    <h3 class="text-themecolor">Profile</h3>
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="javascript:void(0)">Home</a></li>
+                        <li class="breadcrumb-item active">Profile</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="row">
+                <!-- Column -->
+                <div class="col-lg-4 col-xlg-3 col-md-5">
+                    <div class="card">
+                        <div class="card-body">
+                            <center class="m-t-30">
+                                <img src="/member_asset/img/pngguru2.png" class="img-circle" width="150" />
+                                <h4 class="card-title m-t-10">Member Kasin</h4>
+                                <h6 class="card-subtitle" id="join">Bergabung pada </h6>
+                            </center>
+                        </div>
+                    </div>
+                </div>
+                <!-- Column -->
+                <!-- Column -->
+                <div class="col-lg-8 col-xlg-9 col-md-7">
+                    <div class="card">
+                        <!-- Tab panes -->
+                        <div class="card-body">
+                            <h3 class="text-themecolor">Profile</h3>
+                            <form class="form-horizontal form-material" id="formProfile" autocomplete="off">
+                                <input type="hidden" id="id-user" th:value="${session.id_user}">
+                                <div class="form-group">
+                                    <label class="col-md-12">Name</label>
+                                    <div class="col-md-12">
+                                        <input type="text" placeholder="Masukan nama" class="form-control form-control-line" name="nama" autocomplete="off">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="example-email" class="col-md-12">Email</label>
+                                    <div class="col-md-12">
+                                        <input type="email" placeholder="email@admin.com" class="form-control form-control-line" name="email" id="example-email" autocomplete="off">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-12">
+                                        <button type="submit" class="btn btn-themecolor">Update Profile</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <h3 class="text-themecolor">Ubah Password</h3>
+                            <form class="form-horizontal form-material" id="formUbahPassword" autocomplete="off">
+                                <div class="form-group mt-5">
+                                    <label class="col-md-12">Password Lama</label>
+                                    <div class="col-md-12">
+                                        <input type="password" class="form-control form-control-line" id="passwordlama" name="passwordlama" autocomplete="off">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-12">Password Baru</label>
+                                    <div class="col-md-12">
+                                        <input type="password" class="form-control form-control-line" id="password" name="password" autocomplete="off">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-12">Ketik Ulang Password Baru</label>
+                                    <div class="col-md-12">
+                                        <input type="password" class="form-control form-control-line" id="confirm_password" name="password2" autocomplete="off">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-12">
+                                        <button type="submit" class="btn btn-themecolor">Ganti Password</button>
+                                        <span id='message'></span>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <!-- Column -->
+            </div>
+
+        </div>
+
+        <th:block th:include="member/partials/footer :: footer"></th:block>
+    </div>
+</div>
+
+<th:block th:include="member/partials/js :: js"></th:block>
+
+<script>
+    $(document).ready(function(){
+
+        // passwordMatch();
+
+        var id = $("#id-user").val();
+        $.ajax({
+            type : "GET",
+            url : "/member/api/profile/"+ id,
+            success: function(result){
+                $("input[name='nama']").val(result.nama);
+                $("input[name='email']").val(result.email);
+                $("#join").text("Bergabung pada "+result.created_at);
+            },
+            error : function(e) {
+                console.log("ERROR: ", e);
+            }
+        });
+
+        $(document).on("submit", "#formProfile", function (e) {
+            e.preventDefault();
+            var nama = $("input[name='nama']").val();
+            var email = $("input[name='email']").val();
+            $.ajax({
+                type: "PUT",
+                url: "/member/api/profile/"+id,
+                contentType: "application/json",
+                dataType: 'json',
+                data: '{"nama" : "'+nama+'", ' +
+                    '"email" : "'+email+'"}',
+                success: function(result){
+                    toastMsg("success", "Profile berhasil diubah!");
+                },
+                error : function(e) {
+                    console.log("ERROR: ", e);
+                }
+            });
+
+            // var getMessage = $("#message").text();
+            // var getValueOldPass = $("#passwordlama").val();
+            // var getValueNewPass = $("#password").val();
+            // var getValueNewPass2 = $("#confirm_password").val();
+            //
+            // if(getValueOldPass !== ""){
+            //     if(getValueNewPass === "" && getValueNewPass2 === ""){
+            //         $('#message').html('Masukan password baru dulu').css('color', 'red');
+            //     }else{
+            //         if(getMessage === "Boleh ganti password"){
+            //             console.log('-- propil password');
+            //         }else{  }
+            //     }
+            // }else{
+            //     console.log("-- ganti propil");
+            // }
+
+
+        });
+    });
+
+    function toastMsg(type, msg){
+        nativeToast({ //https://www.cssscript.com/create-android-style-toasts-notification-bars-pure-javascript-native-toast/
+            message: ''+msg+'',
+            type: ''+type+'', //success | info | error | warning
+            debug: false,
+            timeout: 5000
+        })
+    }
+
+    function passwordMatch(){
+        var pl = $('#passwordlama');
+
+        pl.on('keyup', function () {
+            if($('#passwordlama').val() === ""){
+                $('#message').html('').css('color', 'red');
+            }else{
+                $('#password, #confirm_password').on('keyup', function () {
+                    var p1 = $('#password').val();
+                    var p2 = $('#confirm_password').val();
+
+                    if(p1 === ""){
+                        $('#message').html('Masukan password baru dulu').css('color', 'red');
+                    }else if (p1 === p2 && $('#passwordlama').val() !== "") {
+                        $('#message').html('Boleh ganti password').css('color', 'green');
+                    }else
+                        $('#message').html('Password Tidak Sama').css('color', 'red');
+                });
+            }
+        });
+
+    }
+</script>
+</body>
+</html>

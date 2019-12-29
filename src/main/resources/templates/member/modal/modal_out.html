@@ -1,0 +1,86 @@
+<th:block th:fragment="modal_out">
+
+    <!-- Modal Kas Pengeluaran -->
+    <div class="modal fade" id="modalOutAdd" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalOutTitle">Ambil kas</h5>
+                </div>
+                <div class="modal-body">
+                    <form class="form-horizontal form-material" id="formOutAdd">
+                        <div class="form-group">
+                            <label class="col-md-12">Keterangan</label>
+                            <div class="col-md-12">
+                                <input type="text" placeholder="Kas dari donatur" class="form-control form-control-line" name="keterangan" id="keteranganOutAdd" autocomplete="off" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-12">Jumlah</label>
+                            <div class="col-md-12">
+                                <input type="text" placeholder="200000" class="form-control form-control-line" name="jumlah" id="jumlahOutAdd" autocomplete="off" required>
+                            </div>
+                        </div>
+                        <div class="float-right form-group">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <input type="submit" class="btn btn-primary" value="Simpan"></input>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalOutUpdate" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalUpdateTitle">Update Kas Keluar</h5>
+                </div>
+                <div class="modal-body">
+                    <form class="form-horizontal form-material" id="formOutUpdate">
+                        <div class="form-group">
+                            <label class="col-md-12">Keterangan</label>
+                            <div class="col-md-12">
+                                <input type="text" placeholder="Kas dari donatur" class="form-control form-control-line" name="keterangan" id="keteranganOutUpdate" autocomplete="off" required/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-12">Jumlah</label>
+                            <div class="col-md-12">
+                                <input type="number" placeholder="200000" class="form-control form-control-line" name="jumlah" id="jumlahOutUpdate" autocomplete="off" required/>
+                            </div>
+                        </div>
+                        <div class="float-right form-group">
+                            <input type="hidden" id="ModalOutUpdateKode"/>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <input type="submit" class="btn btn-success" value="Ganti"/>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Delete -->
+    <div class="modal fade" id="modalOutDelete" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalDeleteTitle">Hapus</h5>
+                </div>
+                <div class="modal-body">
+                    Hapus kas keluar dengan kode <strong id="modalOutDeleteStrong"></strong> ?
+                </div>
+                <div class="modal-footer">
+                    <input type="hidden" id="ModalOutDeleteKode"/>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" id="modalOutDeleteAction" class="btn btn-danger">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</th:block>

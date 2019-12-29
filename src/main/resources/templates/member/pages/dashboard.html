@@ -1,0 +1,36 @@
+<th:block th:fragment="dashboard">
+
+    <div class="d-flex">
+        <div class="container mt-2">
+            <div class="row mx-auto">
+                <div class="col-sm-4">
+                    <div class="card mb-3 text-center" style="background: #fff; border: none;border-radius: 20px;height: 180px;max-width: 18rem;width: 400px;box-shadow: 0 4px 8px 0 rgba(0,0,0,0.1);">
+                        <div class="card-header text-light bg-success" style="border-bottom-left-radius: 50px;border-bottom-right-radius: 50px">Pemasukan</div>
+                        <div class="card-body text-success">
+                            <h5 class="card-title">Jumlah semua kas masuk</h5>
+                            <h2 class="card-text" id="sumkasmasuk"></h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="card border-secondary mb-3 text-center" style="background: #fff; border: none;border-radius: 20px;height: 180px;max-width: 18rem;width: 400px;box-shadow: 0 4px 8px 0 rgba(0,0,0,0.1);">
+                        <div class="card-header text-light bg-megna" style="border-bottom-left-radius: 50px;border-bottom-right-radius: 50px">Pengeluaran</div>
+                        <div class="card-body text-megna">
+                            <h5 class="card-title">Jumlah semua kas keluar</h5>
+                            <h2 class="card-text" id="sumkaskeluar"></h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="card border-danger mb-3 text-center" style="background: #fff; border: none;border-radius: 20px;height: 180px;max-width: 18rem;width: 400px;box-shadow: 0 4px 8px 0 rgba(0,0,0,0.1);">
+                        <div class="card-header text-light bg-theme" style="border-bottom-left-radius: 50px;border-bottom-right-radius: 50px">Sisa</div>
+                        <div class="card-body text-themecolor">
+                            <h5 class="card-title">Jumlah semua sisa kas</h5>
+                            <h2 class="card-text" id="sumsisa"></h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
